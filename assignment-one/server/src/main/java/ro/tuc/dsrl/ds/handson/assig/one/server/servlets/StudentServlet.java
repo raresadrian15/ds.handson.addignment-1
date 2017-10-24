@@ -7,20 +7,41 @@ import ro.tuc.dsrl.ds.handson.assig.one.server.entities.Student;
 import ro.tuc.dsrl.ds.handson.assig.one.protocol.enums.StatusCode;
 import ro.tuc.dsrl.ds.handson.assig.one.protocol.message.RequestMessage;
 import org.hibernate.cfg.Configuration;
+import ro.tuc.dsrl.ds.handson.assig.one.server.entities.StudentId;
 
 /**
  * @Author: Technical University of Cluj-Napoca, Romania
- *          Distributed Systems, http://dsrl.coned.utcluj.ro/
+ * Distributed Systems, http://dsrl.coned.utcluj.ro/
  * @Module: assignment-one-server
  * @Since: Sep 1, 2015
- * @Description:
- *  Serves for generating a response for the student related requests
+ * @Description: Serves for generating a response for the student related requests
  */
 public class StudentServlet extends AbstractServlet {
     private StudentDAO studentDao;
 
     public StudentServlet() {
         studentDao = new StudentDAO(new Configuration().configure().buildSessionFactory());
+    }
+
+    @Override
+    protected String doDelete(RequestMessage message) {
+        String response;
+
+        // Attempt deserializing a Student object from the request
+        StudentId studentId = message.getDeserializedObject(StudentId.class);
+        if (studentId != null) {
+            Student deleteStudent = studentDao.deleteStudent(studentId.getId());
+
+            if (deleteStudent == null) {
+                response = ResponseMessageEncoder.encode(StatusCode.NOT_FOUND);
+            } else {
+                response = ResponseMessageEncoder.encode(StatusCode.OK, deleteStudent);
+            }
+
+        } else {
+            response = ResponseMessageEncoder.encode(StatusCode.BAD_REQUEST);
+        }
+        return response;
     }
 
     @Override

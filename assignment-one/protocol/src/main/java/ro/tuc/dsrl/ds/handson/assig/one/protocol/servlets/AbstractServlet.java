@@ -29,6 +29,8 @@ public abstract class AbstractServlet {
                     return doGet(message);
                 case POST:
                     return doPost(message);
+                case DELETE:
+                    return doDelete(message);
                 default:
                     return ResponseMessageEncoder.encode(StatusCode.BAD_REQUEST);
             }
@@ -37,6 +39,13 @@ public abstract class AbstractServlet {
             return ResponseMessageEncoder.encode(StatusCode.NOT_ALLOWED);
         }
     }
+
+    /**
+     * Called when the request method is DELETE.
+     * @param message he request message to be processed
+     * @return the response of the processing, serialized
+     */
+    protected abstract String doDelete(RequestMessage message);
 
     /**
      * Called when the request method is POST.
